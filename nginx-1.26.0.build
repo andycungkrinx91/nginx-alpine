@@ -1,0 +1,30 @@
+FROM nginx:1.26-alpine
+LABEL maintainer="Andy Cungkrinx <andy.silva270114@gmail.com>" \
+    version.nginx="1.26.0"
+
+ARG NGINX_VER=1.26.0
+
+ENV NGINX_VER="${NGINX_VER}" \
+    APP_ROOT="/var/www/html"
+
+RUN rm -rf /etc/nginx/sites-enabled/default.conf; \
+    addgroup -S app; \
+    adduser -S -D -H -h /var/cache/nginx -s /sbin/nologin -G app app;
+
+COPY conf/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY conf/nginx/conf.d /etc/nginx/conf.d
+COPY ssl /etc/nginx/ssl
+COPY conf/nginx/sites-enabled /etc/nginx/sites-enabled
+COPY html /var/www/html
+
+WORKDIR $APP_ROOT
+EXPOSE 80 443
+
+STOPSIGNAL SIGTERM
+
+RUN rm -rf /var/cache/apk/*; \
+    rm -rf /tmp/*; \
+    chown app:app /var/www/ -R; \
+    cat /dev/null > /root/.ash_history && exit;
+
+CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
