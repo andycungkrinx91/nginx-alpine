@@ -25,6 +25,7 @@ STOPSIGNAL SIGTERM
 RUN rm -rf /var/cache/apk/*; \
     rm -rf /tmp/*; \
     chown app:app /var/www/ -R; \
+    chown app:app /var/cache/nginx -R; \
     cat /dev/null > /root/.ash_history && exit;
 
 CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
